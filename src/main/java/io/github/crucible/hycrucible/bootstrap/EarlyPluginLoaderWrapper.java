@@ -23,6 +23,7 @@ public class EarlyPluginLoaderWrapper {
     private static final String PATHS = "--early-plugins";
 
     private static final Method _collectPluginJars;
+
     private static final Field _pluginClassLoader;
     private static final Field _transformers;
 

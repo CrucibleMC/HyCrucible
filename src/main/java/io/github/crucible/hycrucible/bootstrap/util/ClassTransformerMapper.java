@@ -41,6 +41,10 @@ public final class ClassTransformerMapper {
         return classes;
     }
 
+    public static void loadCandidates() throws IOException {
+        loadCandidates(ClassTransformerMapper.class.getClassLoader());
+    }
+
     public static void loadCandidates(ClassLoader classLoader) throws IOException {
 
         Set<String> classNames = searchCandidates(classLoader);
@@ -62,7 +66,8 @@ public final class ClassTransformerMapper {
             try {
                 ClassTransformer classTransformer = (ClassTransformer) el.getDeclaredConstructor().newInstance();
                 EarlyPluginLoaderWrapper.addTransformer(classTransformer);
-            } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            } catch (InstantiationException | InvocationTargetException | IllegalAccessException |
+                     NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
         });

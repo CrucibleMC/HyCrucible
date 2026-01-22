@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.logging.Level;
 
-@Mixin(HytaleServer.class)
+@Mixin(value = HytaleServer.class, remap = false)
 public class HytaleServerMixin {
 
     @Final

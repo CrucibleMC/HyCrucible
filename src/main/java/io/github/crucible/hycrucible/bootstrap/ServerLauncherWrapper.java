@@ -6,6 +6,7 @@ import io.github.crucible.hycrucible.bootstrap.util.ClassLoaderHolder;
 import io.github.crucible.hycrucible.bootstrap.util.ClassTransformerMapper;
 import io.github.crucible.hycrucible.bootstrap.util.ReflectionAccessor;
 import lombok.Getter;
+import org.spongepowered.asm.mixin.Mixins;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,7 +34,9 @@ public class ServerLauncherWrapper {
 
         List<String> parsedArgs = EarlyPluginLoaderWrapper.init(args);
 
-        ClassTransformerMapper.loadCandidates(ClassTransformerMapper.class.getClassLoader());
+        ClassTransformerMapper.loadCandidates();
+
+        Mixins.addConfiguration("hycrucible.mixins.json");
 
         bootServer(parsedArgs.toArray(new String[0]));
 
