@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+group = 'io.github.crucible'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        name "CodeMC - Hytale"
+        url "https://repo.codemc.io/repository/hytale/"
+    }
+}
+
+dependencies {
+
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
+
+    implementation("com.hypixel.hytale:Server:${hytale_version}")
+
+    implementation 'net.fabricmc:sponge-mixin:0.17.0+mixin.0.8.7'
+    implementation 'io.github.llamalad7:mixinextras-fabric:0.5.3'
+
+}
+
+jar {
+    manifest {
+        attributes(
+                "Implementation-Title": project.name,
+                "Implementation-Version": version,
+                "Main-Class": 'io.github.crucible.hycrucible.bootstrap.ServerLauncherWrapper'
+        )
+    }
+}
