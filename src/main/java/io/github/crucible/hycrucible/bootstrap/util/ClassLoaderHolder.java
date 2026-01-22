@@ -26,16 +26,23 @@ public class ClassLoaderHolder {
         if (contains(pluginClassLoader, clazz)) return pluginClassLoader;
         if (contains(runtimeClassLoader, clazz)) return pluginClassLoader;
 
-        throw new NullPointerException("The ClassLoaderHolder cannot determine an classloader for this element");
+        throw new NullPointerException("The ClassLoaderHolder cannot determine an classloader for " + clazz);
 
     }
 
     public static ClassLoader getClassLoader_(String clazz) throws ClassNotFoundException {
+
         try {
+
+            if (!clazz.endsWith(".class"))
+                clazz = formatClassName(clazz);
+
             return getClassLoader(clazz);
+
         } catch (FileNotFoundException e) {
             throw new ClassNotFoundException(clazz);
         }
+
     }
 
     public static InputStream findResource(String resource) throws FileNotFoundException {
@@ -43,14 +50,11 @@ public class ClassLoaderHolder {
     }
 
     private static boolean contains(ClassLoader classLoader, String clazz) {
-
-//        String normalizedName = formatClassName(clazz);
-
         return classLoader != null && classLoader.getResource(clazz) != null;
     }
 
     public static String formatClassName(String className) {
-       return className.replace(".", "/").concat(".class");
+        return className.replace(".", "/").concat(".class");
     }
 
 

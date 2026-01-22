@@ -1,4 +1,4 @@
-package io.github.crucible.hycrucible.bootstrap.mixin;
+package io.github.crucible.hycrucible.bootstrap.mixin.providers;
 
 import io.github.crucible.hycrucible.bootstrap.util.ClassLoaderHolder;
 import org.spongepowered.asm.service.IClassProvider;

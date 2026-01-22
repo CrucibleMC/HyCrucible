@@ -1,14 +1,19 @@
 package io.github.crucible.hycrucible.bootstrap.mixin;
 
+import io.github.crucible.hycrucible.bootstrap.mixin.providers.BytecodeProvider;
+import io.github.crucible.hycrucible.bootstrap.mixin.providers.ClassProvider;
 import io.github.crucible.hycrucible.bootstrap.util.ClassLoaderHolder;
 import lombok.SneakyThrows;
 import org.spongepowered.asm.launch.platform.container.ContainerHandleURI;
 import org.spongepowered.asm.launch.platform.container.ContainerHandleVirtual;
 import org.spongepowered.asm.launch.platform.container.IContainerHandle;
+import org.spongepowered.asm.logging.ILogger;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer;
 import org.spongepowered.asm.mixin.transformer.IMixinTransformerFactory;
 import org.spongepowered.asm.service.*;
+import org.spongepowered.asm.service.modlauncher.ModLauncherAuditTrail;
+import org.spongepowered.asm.service.modlauncher.ModLauncherClassTracker;
 import org.spongepowered.asm.util.IConsumer;
 
 import java.io.InputStream;
@@ -20,6 +25,9 @@ public class Service extends MixinServiceAbstract {
 
     public static IMixinTransformer transformer;
     public static IConsumer<MixinEnvironment.Phase> phaseConsumer;
+
+    public static ModLauncherAuditTrail modLauncherAuditTrail;
+    public static ModLauncherClassTracker modLauncherClassTracker;
 
 
     @Override
@@ -49,12 +57,16 @@ public class Service extends MixinServiceAbstract {
 
     @Override
     public IClassTracker getClassTracker() {
-        return null;
+        if(modLauncherClassTracker != null)
+            return modLauncherClassTracker;
+        return (modLauncherClassTracker = new ModLauncherClassTracker());
     }
 
     @Override
     public IMixinAuditTrail getAuditTrail() {
-        return null;
+        if(modLauncherAuditTrail != null)
+            return modLauncherAuditTrail;
+        return (modLauncherAuditTrail = new ModLauncherAuditTrail());
     }
 
     @Override
@@ -87,6 +99,11 @@ public class Service extends MixinServiceAbstract {
     public void wire(MixinEnvironment.Phase phase, IConsumer<MixinEnvironment.Phase> phaseConsumer) {
         super.wire(phase, phaseConsumer);
         Service.phaseConsumer = phaseConsumer;
+    }
+
+    @Override
+    protected ILogger createLogger(String name) {
+        return new LoggerBridge(name);
     }
 
 }
