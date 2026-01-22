@@ -2,6 +2,7 @@ package io.github.crucible.hycrucible.bootstrap;
 
 import com.hypixel.hytale.plugin.early.ClassTransformer;
 import com.hypixel.hytale.plugin.early.EarlyPluginLoader;
+import io.github.crucible.hycrucible.bootstrap.util.ClassLoaderHolder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -64,6 +65,8 @@ public class EarlyPluginLoaderWrapper {
         var plugins = collectPluginJars(parsedPaths);
 
         loadTransformers(plugins.toArray(new URL[0]));
+
+        ClassLoaderHolder.setPluginClassLoader(pluginClassLoader);
 
         return parsedArgs;
 
@@ -156,6 +159,7 @@ public class EarlyPluginLoaderWrapper {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public static void addTransformer(ClassTransformer transformer) {
+        ServerLauncherWrapper.getLogger().atInfo().log("[EarlyPlugin] Loading transformer: " + transformer.getClass().getName() + " (priority=" + transformer.priority() + ")");
         ((List<ClassTransformer>) _transformers.get(null)).add(transformer);
     }
 

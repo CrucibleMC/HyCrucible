@@ -3,6 +3,8 @@ package io.github.crucible.hycrucible.bootstrap;
 import com.hypixel.hytale.Main;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.plugin.early.TransformingClassLoader;
+import io.github.crucible.hycrucible.bootstrap.util.ClassLoaderHolder;
+import io.github.crucible.hycrucible.bootstrap.util.ClassTransformerMapper;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -21,6 +23,8 @@ public class ServerLauncherWrapper {
 
     @SneakyThrows
     static void main(String[] args) {
+
+        ClassLoaderHolder.setSystemClassLoader(ServerLauncherWrapper.class.getClassLoader());
 
         logger = HytaleLogger.get("HyCrucible");
 

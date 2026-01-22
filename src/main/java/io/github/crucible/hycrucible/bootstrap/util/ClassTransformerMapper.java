@@ -1,6 +1,7 @@
-package io.github.crucible.hycrucible.bootstrap;
+package io.github.crucible.hycrucible.bootstrap.util;
 
 import com.hypixel.hytale.plugin.early.ClassTransformer;
+import io.github.crucible.hycrucible.bootstrap.EarlyPluginLoaderWrapper;
 import io.github.crucible.hycrucible.bootstrap.annotations.Transformer;
 
 import java.io.File;

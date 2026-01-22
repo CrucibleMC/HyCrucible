@@ -22,6 +22,10 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.42")
 
     implementation("com.hypixel.hytale:Server:${hytale_version}")
+
+    implementation 'net.fabricmc:sponge-mixin:0.17.0+mixin.0.8.7'
+    implementation 'io.github.llamalad7:mixinextras-fabric:0.5.3'
+
 }
 
 jar {
