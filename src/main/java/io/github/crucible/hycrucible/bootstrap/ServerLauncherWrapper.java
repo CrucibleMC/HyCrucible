@@ -1,15 +1,13 @@
 package io.github.crucible.hycrucible.bootstrap;
 
-import com.hypixel.hytale.Main;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.plugin.early.TransformingClassLoader;
 import io.github.crucible.hycrucible.bootstrap.util.ClassLoaderHolder;
 import io.github.crucible.hycrucible.bootstrap.util.ClassTransformerMapper;
+import io.github.crucible.hycrucible.bootstrap.util.ReflectionAccessor;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
@@ -19,10 +17,10 @@ public class ServerLauncherWrapper {
     @Getter
     private static HytaleLogger logger;
 
-    private static Method _getClasspathUrls;
+    @Getter
+    private static TransformingClassLoader transformingClassLoader;
 
-    @SneakyThrows
-    static void main(String[] args) {
+    static void main(String[] args) throws IOException {
 
         ClassLoaderHolder.setSystemClassLoader(ServerLauncherWrapper.class.getClassLoader());
 
@@ -32,9 +30,6 @@ public class ServerLauncherWrapper {
 
         System.setProperty("java.awt.headless", "true");
         System.setProperty("file.encoding", "UTF-8");
-
-        _getClasspathUrls = Main.class.getDeclaredMethod("getClasspathUrls");
-        _getClasspathUrls.setAccessible(true);
 
         List<String> parsedArgs = EarlyPluginLoaderWrapper.init(args);
 
@@ -46,44 +41,27 @@ public class ServerLauncherWrapper {
 
     private static void bootServer(String[] args) {
 
-        try {
+        URL[] urls = ReflectionAccessor.<URL[]>method(
+                ClassLoaderHolder.getSystemClassLoader(),
+                "com.hypixel.hytale.Main",
+                "getClasspathUrls"
+        ).$();
 
-            URL[] urls = (URL[]) _getClasspathUrls.invoke(null);
+        transformingClassLoader = new TransformingClassLoader(
+                urls,
+                EarlyPluginLoaderWrapper.getTransformers(),
+                ClassLoaderHolder.getSystemClassLoader().getParent(),
+                ClassLoaderHolder.getSystemClassLoader()
+        );
 
-            ClassLoader appClassLoader = ServerLauncherWrapper.class.getClassLoader();
+        Thread.currentThread().setContextClassLoader(transformingClassLoader);
 
-            TransformingClassLoader transformingClassLoader = new TransformingClassLoader(
-                    urls, EarlyPluginLoaderWrapper.getTransformers(), appClassLoader.getParent(), appClassLoader
-            );
-
-            Thread.currentThread().setContextClassLoader(transformingClassLoader);
-
-            Class<?> lateMainClass = transformingClassLoader.loadClass("com.hypixel.hytale.LateMain");
-
-            Method mainMethod = lateMainClass.getMethod("lateMain", String[].class);
-
-            mainMethod.setAccessible(true);
-            mainMethod.invoke((Object) null, (Object) args);
-
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-
-            throw new RuntimeException("Failed to launch with transforming classloader", e);
-
-        } catch (InvocationTargetException e) {
-
-            Throwable cause = e.getCause();
-
-            if (cause instanceof RuntimeException re) {
-                throw re;
-            } else if (cause instanceof Error err) {
-                throw err;
-            } else {
-                throw new RuntimeException("LateMain.lateMain() threw an exception", cause);
-            }
-
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        ReflectionAccessor.loadAndGetMethod(
+                ServerLauncherWrapper.getTransformingClassLoader(),
+                "com.hypixel.hytale.LateMain",
+                "lateMain",
+                String[].class
+        ).$((Object) args);
 
     }
 
